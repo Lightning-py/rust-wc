@@ -43,3 +43,80 @@ fn main() {
         }
     }
 }
+
+#[cfg(test)]
+
+mod tests {
+
+    use super::*;
+    use std::io::Write;
+    use tempfile::NamedTempFile;
+
+    #[test]
+
+    fn test_counter_with_empty_file() {
+        let file = NamedTempFile::new().unwrap();
+
+        let path = file.path().to_str().unwrap();
+
+        let result = counter(path).unwrap();
+
+        assert_eq!(result, (0, 0, 0));
+    }
+
+    #[test]
+
+    fn test_counter_with_single_line() {
+        let file = NamedTempFile::new().unwrap();
+
+        let path = file.path().to_str().unwrap();
+
+        writeln!(file.as_file(), "Hello, world!").unwrap();
+
+        let result = counter(path).unwrap();
+
+        assert_eq!(result, (1, 2, 14));
+    }
+
+    #[test]
+
+    fn test_counter_with_multiple_lines() {
+        let file = NamedTempFile::new().unwrap();
+
+        let path = file.path().to_str().unwrap();
+
+        writeln!(file.as_file(), "Hello, world!").unwrap();
+        writeln!(file.as_file(), "This is a test.").unwrap();
+
+        let result = counter(path).unwrap();
+
+        assert_eq!(result, (2, 6, 30));
+    }
+
+    #[test]
+
+    fn test_counter_with_whitespace() {
+        let file = NamedTempFile::new().unwrap();
+
+        let path = file.path().to_str().unwrap();
+
+        writeln!(file.as_file(), "   ").unwrap();
+        writeln!(file.as_file(), "Hello, world!").unwrap();
+
+        let result = counter(path).unwrap();
+
+        assert_eq!(result, (2, 2, 18));
+    }
+
+    #[test]
+
+    fn test_counter_with_special_characters() {
+        let file = NamedTempFile::new().unwrap();
+
+        let path = file.path().to_str().unwrap();
+        writeln!(file.as_file(), "Hello, world! @2023").unwrap();
+
+        let result = counter(path).unwrap();
+        assert_eq!(result, (1, 3, 20));
+    }
+}
